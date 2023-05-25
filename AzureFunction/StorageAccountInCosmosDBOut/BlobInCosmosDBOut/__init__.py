@@ -9,7 +9,7 @@ import os, uuid, time
 
 def main(myblob: func.InputStream, image: func.Out[func.InputStream], outputDocument: func.Out[func.Document]) -> str:
     AZURE_SA_CONNECTION_STRING = os.getenv('MyStorageAccountAppSetting')
-    AZURE_COSMOS_CONNECTION_STRING = os.getenv('CosmosDbConnectionString')
+    # AZURE_COSMOS_CONNECTION_STRING = os.getenv('CosmosDbConnectionString')
     logging.info(f'Python blob trigger function processed blob. \n'
                  f'Name:{myblob.name}\n'
                  f'Blob Size: {myblob.length} bytes')
@@ -34,10 +34,10 @@ def main(myblob: func.InputStream, image: func.Out[func.InputStream], outputDocu
     # destination_blob.upload_blob_from_url(source_url=source_blob.url, overwrite=True)
     destination_blob.start_copy_from_url(source_url=source_blob.url)
     logging.info(f'Uploading {myblob.name} to image folder')
-    #time.sleep(3)
+    # time.sleep(3)
     source_blob.delete_blob(delete_snapshots="include")
     logging.info(f'deleting {myblob.name} from the upload container')
-    cosmos_client = CosmosClient.from_connection_string(conn_str=AZURE_COSMOS_CONNECTION_STRING)
+    # cosmos_client = CosmosClient.from_connection_string(conn_str=AZURE_COSMOS_CONNECTION_STRING)
     record = {
         "id" : str(uuid.uuid5(uuid.NAMESPACE_DNS, f"persist/image/{blobname}")),
         "name": blobname,
