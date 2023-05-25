@@ -1,0 +1,28 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "name": "myblob",
+      "type": "blobTrigger",
+      "direction": "in",
+      "path": "upload/{filename}",
+      "connection": "MyStorageAccountAppSetting"
+    },
+    {
+      "type": "blob",
+      "name": "image",
+      "path": "persist/image/{filename}",
+      "direction": "out",
+      "connection": "MyStorageAccountAppSetting"
+    },
+    {
+      "type": "cosmosDB",
+      "direction": "out",
+      "name": "outputDocument",
+      "databaseName": "mydb",
+      "collectionName": "mycontainer",
+      "createIfNotExists": "false",
+      "connectionStringSetting": "CosmosDbConnectionString"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "type": "eventGridTrigger",
+      "name": "event",
+      "direction": "in"
+    },
+    {
+      "type": "sql",
+      "name": "product",
+      "direction": "out",
+      "commandText": "[dbo].[Products]",
+      "connectionStringSetting": "SQLDB_CONNECTION_STRING"
+    }
+  ],
+  "disabled": false
+}
