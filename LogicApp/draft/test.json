@@ -1,0 +1,198 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Condition": {
+                "actions": {
+                    "Copy_blob_(V2)": {
+                        "inputs": {
+                            "headers": {
+                                "ReadFileMetadataFromServer": true
+                            },
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('managedplatformb7a3'))}/copyFile",
+                            "queries": {
+                                "destination": "/@{variables('destinationContainer')}/@{variables('folderName')}/@{triggerBody()?['Name']}",
+                                "overwrite": true,
+                                "queryParametersSingleEncoded": true,
+                                "source": "@triggerBody()?['Path']"
+                            }
+                        },
+                        "runAfter": {
+                            "Set_variable": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "ApiConnection"
+                    },
+                    "Set_variable": {
+                        "inputs": {
+                            "name": "folderName",
+                            "value": "@{substring(triggerBody()?['Name'], 0, 3)}"
+                        },
+                        "runAfter": {},
+                        "type": "SetVariable"
+                    }
+                },
+                "else": {
+                    "actions": {
+                        "Copy_blob_(V2)_2": {
+                            "inputs": {
+                                "headers": {
+                                    "ReadFileMetadataFromServer": true
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('managedplatformb7a3'))}/copyFile",
+                                "queries": {
+                                    "destination": "/@{variables('destinationContainer')}/@{variables('folderName')}/@{triggerBody()?['Name']}",
+                                    "overwrite": false,
+                                    "queryParametersSingleEncoded": true,
+                                    "source": "@triggerBody()?['Path']"
+                                }
+                            },
+                            "runAfter": {},
+                            "type": "ApiConnection"
+                        }
+                    }
+                },
+                "expression": {
+                    "or": [
+                        {
+                            "endsWith": [
+                                "@triggerBody()?['Name']",
+                                "jpg"
+                            ]
+                        },
+                        {
+                            "endsWith": [
+                                "@triggerBody()?['Name']",
+                                "png"
+                            ]
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_destinationFoler": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "If"
+            },
+            "Delete_blob_(V2)": {
+                "inputs": {
+                    "headers": {
+                        "SkipDeleteIfFileNotFoundOnServer": false
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureblob']['connectionId']"
+                        }
+                    },
+                    "method": "delete",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('managedplatformb7a3 '))}/files/@{encodeURIComponent(encodeURIComponent(triggerBody()?['Path']))}"
+                },
+                "runAfter": {
+                    "Condition": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "Initialize_destinationContainer": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "destinationContainer",
+                            "type": "string",
+                            "value": "persist"
+                        }
+                    ]
+                },
+                "runAfter": {},
+                "type": "InitializeVariable"
+            },
+            "Initialize_destinationFoler": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "folderName",
+                            "type": "string",
+                            "value": "others"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_destinationContainer": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "When_a_blob_is_added_or_modified_(properties_only)_(V2)": {
+                "evaluatedRecurrence": {
+                    "frequency": "Minute",
+                    "interval": 1
+                },
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureblob']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('managedplatformb7a3'))}/triggers/batch/onupdatedfile",
+                    "queries": {
+                        "checkBothCreatedAndModifiedDateTime": false,
+                        "folderId": "JTJmdXBsb2Fk",
+                        "maxFileCount": 10
+                    }
+                },
+                "metadata": {
+                    "JTJmdXBsb2Fk": "/upload"
+                },
+                "recurrence": {
+                    "frequency": "Minute",
+                    "interval": 1
+                },
+                "splitOn": "@triggerBody()",
+                "type": "ApiConnection"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "azureblob": {
+                    "connectionId": "/subscriptions/2ae1fd78-e5cc-485c-9da9-90f9f90bc0c4/resourceGroups/managedPlatform/providers/Microsoft.Web/connections/azureblob",
+                    "connectionName": "azureblob",
+                    "connectionProperties": {
+                        "authentication": {
+                            "type": "ManagedServiceIdentity"
+                        }
+                    },
+                    "id": "/subscriptions/2ae1fd78-e5cc-485c-9da9-90f9f90bc0c4/providers/Microsoft.Web/locations/australiaeast/managedApis/azureblob"
+                }
+            }
+        }
+    }
+}
